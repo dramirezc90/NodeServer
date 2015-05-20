@@ -36,6 +36,87 @@ sequelize
         }
     })
 
+
+
+// INICIO DE SERVIDOR REST API
+
+app.get('/restaurantes', function(req, res) {
+
+    //sequelize.query('SELECT * FROM Restaurante', {
+    //    type: Sequelize.QueryTypes.SELECT
+    //})
+
+
+    sequelize.query('SELECT Restaurante.idRestaurante, Restaurante.imagen, Restaurante.nombre, Restaurante.calificacion, Ubicacion.direccion, ' +
+    'Horario.dia, Horario.horaInicio, Horario.horaFin ' +
+    'FROM Restaurante JOIN Ubicacion ON (Restaurante.idRestaurante = Ubicacion.idRestaurante) ' +
+    'JOIN Horario ON (Restaurante.idRestaurante = Horario.restaurante) GROUP BY nombre ORDER BY calificacion DESC', {
+        type: Sequelize.QueryTypes.SELECT
+    })
+
+        //sequelize.query('SELECT Restaurante.nombre, Restaurante.calificacion, Ubicacion.direccion, ' +
+        //'Horario.dia, Horario.horaInicio, Horario.horaFin ' +
+        //'FROM Restaurante JOIN Ubicacion ON (Restaurante.idRestaurante = Ubicacion.idRestaurante) ' +
+        //'JOIN Horario ON (Restaurante.idRestaurante = Horario.restaurante) ORDER BY nombre', restaurante, {
+        //    type: Sequelize.QueryTypes.SELECT
+        //})
+
+        .then(function (r) {
+            res.status(200);
+            res.send(r);
+            console.log(r);
+        })
+})
+
+app.get('/restaurantes/:id', function(req, res) {
+
+    //console.log(req);
+    var id = req.params.id;
+
+    //sequelize.query('SELECT nombre FROM Restaurante WHERE idRestaurante='+id, {type: Sequelize.QueryTypes.SELECT})
+
+    sequelize.query('SELECT Restaurante.idRestaurante, Restaurante.especialidad, Restaurante.imagen, Restaurante.nombre, Restaurante.calificacion, Ubicacion.direccion, ' +
+    'Horario.dia, Horario.horaInicio, Horario.horaFin ' +
+    'FROM Restaurante JOIN Ubicacion ON (Restaurante.idRestaurante = Ubicacion.idRestaurante) ' +
+    'JOIN Horario ON (Restaurante.idRestaurante = Horario.restaurante) WHERE Restaurante.idRestaurante='+id, {
+        type: Sequelize.QueryTypes.SELECT
+    })
+        .then(function (r) {
+            res.status(200);
+            res.send(r);
+            console.log(r);
+        })
+})
+
+
+app.get('/mapa', function(req, res) {
+
+    //console.log(req);
+    var id = req.params.id;
+
+    //sequelize.query('SELECT nombre FROM Restaurante WHERE idRestaurante='+id, {type: Sequelize.QueryTypes.SELECT})
+
+    sequelize.query('SELECT Restaurante.idRestaurante, Restaurante.imagen, Restaurante.nombre, Ubicacion.longi, Ubicacion.lat ' +
+    'FROM Restaurante JOIN Ubicacion ON (Restaurante.idRestaurante = Ubicacion.idRestaurante) ', {
+        type: Sequelize.QueryTypes.SELECT
+    })
+        .then(function (r) {
+            res.status(200);
+            res.send(r);
+            console.log(r);
+        })
+})
+
+
+
+
+
+
+
+
+
+
+
 // DEFINICION DE LOS TIPOS DE OBJETOS ORM
 
 var cliente = sequelize.define('Cliente', {
@@ -159,37 +240,6 @@ var comidaRest = sequelize.define('Comida/Rest', {
         references: 'Restaurante',
         referencesKey: 'idRestaurante'
     }
-})
-
-
-// INICIO DE SERVIDOR REST API
-
-app.get('/restaurantes', function(req, res) {
-
-    //sequelize.query('SELECT * FROM Restaurante', {
-    //    type: Sequelize.QueryTypes.SELECT
-    //})
-
-
-    sequelize.query('SELECT Restaurante.idRestaurante, Restaurante.imagen, Restaurante.nombre, Restaurante.calificacion, Ubicacion.direccion, ' +
-    'Horario.dia, Horario.horaInicio, Horario.horaFin ' +
-    'FROM Restaurante JOIN Ubicacion ON (Restaurante.idRestaurante = Ubicacion.idRestaurante) ' +
-    'JOIN Horario ON (Restaurante.idRestaurante = Horario.restaurante) GROUP BY nombre ORDER BY calificacion DESC', {
-        type: Sequelize.QueryTypes.SELECT
-    })
-
-    //sequelize.query('SELECT Restaurante.nombre, Restaurante.calificacion, Ubicacion.direccion, ' +
-    //'Horario.dia, Horario.horaInicio, Horario.horaFin ' +
-    //'FROM Restaurante JOIN Ubicacion ON (Restaurante.idRestaurante = Ubicacion.idRestaurante) ' +
-    //'JOIN Horario ON (Restaurante.idRestaurante = Horario.restaurante) ORDER BY nombre', restaurante, {
-    //    type: Sequelize.QueryTypes.SELECT
-    //})
-
-        .then(function (r) {
-            res.status(200);
-            res.send(r);
-            console.log(r);
-        })
 });
 
 app.listen(8080);

@@ -42,11 +42,6 @@ sequelize
 
 app.get('/restaurantes', function(req, res) {
 
-    //sequelize.query('SELECT * FROM Restaurante', {
-    //    type: Sequelize.QueryTypes.SELECT
-    //})
-
-
     sequelize.query('SELECT Restaurante.idRestaurante, Restaurante.imagen, Restaurante.nombre, Restaurante.calificacion, Ubicacion.direccion, ' +
     'Horario.dia, Horario.horaInicio, Horario.horaFin ' +
     'FROM Restaurante JOIN Ubicacion ON (Restaurante.idRestaurante = Ubicacion.idRestaurante) ' +
@@ -54,31 +49,63 @@ app.get('/restaurantes', function(req, res) {
         type: Sequelize.QueryTypes.SELECT
     })
 
-        //sequelize.query('SELECT Restaurante.nombre, Restaurante.calificacion, Ubicacion.direccion, ' +
-        //'Horario.dia, Horario.horaInicio, Horario.horaFin ' +
-        //'FROM Restaurante JOIN Ubicacion ON (Restaurante.idRestaurante = Ubicacion.idRestaurante) ' +
-        //'JOIN Horario ON (Restaurante.idRestaurante = Horario.restaurante) ORDER BY nombre', restaurante, {
-        //    type: Sequelize.QueryTypes.SELECT
-        //})
+    .then(function (r) {
+        res.status(200);
+        res.send(r);
+        console.log(r);
+    })
+})
 
+app.post('/addCom', function (req, res) {
+    var id = req.body.correo;
+
+    sequelize.query("INSERT INTO `rest_mysql`.`Comentarios` (`idComentario`, `fecha`, `calificacion`, `texto`, `restaurante`, `usuario`)" +
+    " VALUES (NULL, CURRENT_TIMESTAMP, '"+ req.body.calif +"', '"+ req.body.text +"', '"+ req.body.idR +"', '"+ req.body.correo +"');")
         .then(function (r) {
             res.status(200);
             res.send(r);
             console.log(r);
         })
-})
+
+    })
 
 app.get('/restaurantes/:id', function(req, res) {
 
-    //console.log(req);
     var id = req.params.id;
-
-    //sequelize.query('SELECT nombre FROM Restaurante WHERE idRestaurante='+id, {type: Sequelize.QueryTypes.SELECT})
 
     sequelize.query('SELECT Restaurante.idRestaurante, Restaurante.especialidad, Restaurante.imagen, Restaurante.nombre, Restaurante.calificacion, Ubicacion.direccion, ' +
     'Horario.dia, Horario.horaInicio, Horario.horaFin ' +
     'FROM Restaurante JOIN Ubicacion ON (Restaurante.idRestaurante = Ubicacion.idRestaurante) ' +
     'JOIN Horario ON (Restaurante.idRestaurante = Horario.restaurante) WHERE Restaurante.idRestaurante='+id, {
+        type: Sequelize.QueryTypes.SELECT
+    })
+    .then(function (r) {
+        res.status(200);
+        res.send(r);
+        console.log(r);
+    })
+})
+
+
+app.get('/comidas/:id', function(req, res) {
+    var id = req.params.id;
+
+    sequelize.query('SELECT DISTINCT Comidas.categoria FROM Comidas JOIN Comida_Rest ON (Comidas.idComida = Comida_Rest.Comida) '+
+    'JOIN Restaurante ON (Comida_Rest.Restaurante = Restaurante.idRestaurante) WHERE idRestaurante ='+id, {
+        type:Sequelize.QueryTypes.SELECT
+    })
+    .then(function (r) {
+        res.status(200);
+        res.send(r);
+        console.log(r);
+    })
+})
+
+app.get('/comentarios/:id', function(req, res) {
+
+    var id = req.params.id;
+
+    sequelize.query('SELECT * FROM Comentarios JOIN Usuario ON (Usuario.correo = Comentarios.usuario) WHERE Comentarios.restaurante ='+id+' AND Comentarios.aprobado = 1', {
         type: Sequelize.QueryTypes.SELECT
     })
         .then(function (r) {

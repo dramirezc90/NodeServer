@@ -116,6 +116,7 @@ app.get('/comentarios/:id', function(req, res) {
 })
 
 
+
 app.get('/mapa', function(req, res) {
 
     //console.log(req);
